@@ -1,6 +1,954 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+<head><!DOCTYPE html>
+<html lang="pt-BR">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cobr.ai — Waleska</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f0f0f;--s1:#181818;--s2:#202020;--s3:#282828;
+  --bd:#2e2e2e;--bd2:#383838;
+  --ac:#c8f060;--ac2:#60f0c8;--danger:#f06868;--warn:#f0c060;
+  --txt:#f0ede8;--m1:#999;--m2:#666;--m3:#444;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;overflow-x:hidden;}
+button{cursor:pointer;font-family:'DM Sans',sans-serif;}
+input,select,textarea{font-family:'DM Sans',sans-serif;}
+.app{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-width:220px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--bd);font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.sidebar-logo span{color:var(--ac);}
+.sidebar-section{padding:14px 16px 6px;font-size:10px;color:var(--m2);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:10px 16px;font-size:13.5px;color:var(--m1);border:none;background:none;width:100%;text-align:left;transition:all .15s;}
+.nav-item:hover,.nav-item.active{background:var(--s2);color:var(--txt);}
+.nav-item.active{border-left:2px solid var(--ac);padding-left:14px;}
+.nav-item svg{opacity:.6;flex-shrink:0;}
+.nav-item.active svg{opacity:1;}
+.month-list{padding:6px 10px 10px;}
+.month-btn{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;width:100%;background:none;border:none;color:var(--m1);font-size:13px;transition:all .15s;}
+.month-btn:hover{background:var(--s2);color:var(--txt);}
+.month-btn.active{background:var(--s3);color:var(--ac);font-weight:600;}
+.mbadge{font-size:10px;background:var(--s3);padding:2px 7px;border-radius:999px;color:var(--m2);}
+.btn-new-month{margin:4px 10px 10px;display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;background:none;border:1px dashed var(--m3);color:var(--m2);font-size:13px;width:calc(100% - 20px);transition:all .15s;}
+.btn-new-month:hover{border-color:var(--ac);color:var(--ac);}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{padding:20px 28px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.topbar-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
+.topbar-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+
+/* STATS */
+.stats-row{display:flex;gap:1px;background:var(--bd);border-bottom:1px solid var(--bd);}
+.stat{flex:1;background:var(--s1);padding:16px 20px;}
+.stat-label{font-size:10px;color:var(--m2);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:5px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;}
+.stat-val.green{color:var(--ac);}
+.stat-val.warn{color:var(--warn);}
+
+/* TOOLBAR */
+.toolbar{padding:16px 28px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--bd);}
+.search-wrap{position:relative;flex:1;min-width:180px;}
+.search-wrap input{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:9px 14px 9px 38px;color:var(--txt);font-size:13.5px;outline:none;transition:border-color .2s;}
+.search-wrap input:focus{border-color:var(--ac);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--m2);font-size:14px;pointer-events:none;}
+.pill{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;color:var(--m1);font-size:13px;transition:all .15s;}
+.pill:hover,.pill.on{border-color:var(--ac);color:var(--ac);background:rgba(200,240,96,.06);}
+
+/* GRID */
+.grid{padding:20px 28px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px;}
+.empty-state{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--m2);}
+.empty-state h3{font-family:'Syne',sans-serif;font-size:18px;margin-bottom:8px;color:var(--m1);}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;overflow:hidden;transition:border-color .2s,transform .15s;}
+.card:hover{border-color:var(--bd2);transform:translateY(-2px);}
+.card.paid{opacity:.45;}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--bd);}
+.card-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;display:flex;align-items:center;gap:7px;}
+.paid-tag{font-size:9px;background:var(--s3);color:var(--m2);padding:2px 7px;border-radius:999px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;display:none;}
+.card.paid .paid-tag{display:inline;}
+.paid-date{font-size:10px;color:var(--ac2);margin-left:4px;}
+.card-total{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ac);}
+.card.paid .card-total{color:var(--m2);}
+.card-items{padding:8px 18px 10px;}
+.ci{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.04);}
+.ci:last-child{border-bottom:none;}
+.ci-desc{flex:1;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ci-val{font-family:'Syne',sans-serif;font-size:12.5px;font-weight:600;white-space:nowrap;}
+.card-foot{padding:10px 18px;background:var(--s2);display:flex;gap:7px;}
+.btn-primary{flex:1;background:var(--ac);color:#0f0f0f;border:none;border-radius:9px;padding:9px 0;font-family:'Syne',sans-serif;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;}
+.btn-primary:hover{background:#d4f56a;transform:scale(1.02);}
+.card.paid .btn-primary{background:var(--s3);color:var(--m2);pointer-events:none;}
+.btn-icon{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:9px 11px;color:var(--m1);font-size:13px;transition:all .15s;}
+.btn-icon:hover{border-color:var(--ac2);color:var(--ac2);}
+.btn-icon.del:hover{border-color:var(--danger);color:var(--danger);}
+.btn-icon.pay-btn:hover{border-color:var(--ac);color:var(--ac);}
+
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--bd);border-radius:20px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;}
+.modal-lg{max-width:660px;}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--bd);}
+.mh h2{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;}
+.mclose{background:none;border:none;color:var(--m2);font-size:22px;line-height:1;padding:4px;}
+.mb{padding:20px 24px;}
+.mf{padding:14px 24px 20px;display:flex;gap:10px;border-top:1px solid var(--bd);}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;color:var(--m1);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.6px;}
+.field input,.field select{width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;color:var(--txt);font-size:14px;outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus{border-color:var(--ac);}
+.field select option{background:var(--s2);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* items editor */
+.items-editor{border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+.ie-row{display:grid;grid-template-columns:1fr 110px 80px 80px 36px;gap:0;border-bottom:1px solid var(--bd);}
+.ie-row:last-child{border-bottom:none;}
+.ie-row input,.ie-row select{background:none;border:none;border-right:1px solid var(--bd);border-radius:0;padding:9px 10px;color:var(--txt);font-size:12.5px;outline:none;width:100%;}
+.ie-row input:last-of-type,.ie-row select:last-of-type{border-right:none;}
+.ie-row input:focus,.ie-row select:focus{background:rgba(200,240,96,.04);}
+.ie-row select option{background:var(--s2);}
+.ie-del{background:none;border:none;color:var(--m3);font-size:16px;padding:0 8px;transition:color .15s;}
+.ie-del:hover{color:var(--danger);}
+.ie-header{display:grid;grid-template-columns:1fr 110px 80px 80px 36px;background:var(--s3);border-bottom:1px solid var(--bd);}
+.ie-header span{padding:7px 10px;font-size:10px;color:var(--m2);text-transform:uppercase;letter-spacing:.8px;font-weight:600;}
+.btn-add-item{width:100%;background:none;border:none;border-top:1px solid var(--bd);padding:10px;color:var(--m2);font-size:13px;transition:all .15s;border-radius:0 0 12px 12px;}
+.btn-add-item:hover{background:rgba(200,240,96,.05);color:var(--ac);}
+
+/* buttons */
+.btn-save{flex:1;background:var(--ac);color:#0f0f0f;border:none;border-radius:10px;padding:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;transition:all .15s;}
+.btn-save:hover{background:#d4f56a;}
+.btn-cancel{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:11px 18px;color:var(--m1);font-size:14px;transition:all .15s;}
+.btn-cancel:hover{border-color:var(--bd2);color:var(--txt);}
+.btn-wpp{flex:1;background:#25D366;border:none;border-radius:12px;padding:13px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;}
+.btn-wpp:hover{background:#1ebd5c;}
+.btn-copy2{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:13px 18px;color:var(--txt);font-size:14px;transition:all .15s;}
+.btn-copy2:hover{border-color:var(--ac2);color:var(--ac2);}
+.msg-preview{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;font-size:13.5px;line-height:1.75;color:#ccc;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow-y:auto;}
+.pix-bar{margin:14px 0 0;background:rgba(200,240,96,.07);border:1px solid rgba(200,240,96,.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--ac);display:flex;align-items:center;gap:8px;}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s3);border:1px solid var(--bd2);border-radius:999px;padding:10px 20px;font-size:13px;color:var(--txt);opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* CSV IMPORT */
+.csv-box{background:var(--s2);border:2px dashed var(--bd2);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+.csv-box:hover,.csv-box.drag{border-color:var(--ac);background:rgba(200,240,96,.05);}
+.csv-box p{font-size:13px;color:var(--m1);margin:6px 0 0;}
+.csv-preview{background:var(--s2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.csv-preview table{width:100%;border-collapse:collapse;font-size:12px;}
+.csv-preview th{background:var(--s3);padding:7px 10px;text-align:left;color:var(--m1);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.6px;}
+.csv-preview td{padding:7px 10px;border-bottom:1px solid var(--bd);color:var(--txt);}
+.csv-preview tr:last-child td{border-bottom:none;}
+.csv-info{background:rgba(200,240,96,.07);border:1px solid rgba(200,240,96,.15);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ac);line-height:1.7;}
+
+/* DASHBOARD */
+.dash-grid{padding:20px 28px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.dash-card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:20px;}
+.dash-card h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--m1);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px;}
+.dash-card.wide{grid-column:1/-1;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bar-label{font-size:12px;color:var(--m1);min-width:80px;text-align:right;}
+.bar-track{flex:1;height:8px;background:var(--s3);border-radius:999px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:999px;background:var(--ac);transition:width .6s ease;}
+.bar-fill.paid{background:var(--ac2);}
+.bar-fill.pend{background:var(--warn);}
+.bar-val{font-size:12px;font-family:'Syne',sans-serif;font-weight:600;color:var(--txt);min-width:80px;}
+.year-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;}
+.ys-item{background:var(--s2);border-radius:10px;padding:12px;text-align:center;}
+.ys-label{font-size:10px;color:var(--m2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.ys-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+.ys-val.g{color:var(--ac);}
+.ys-val.w{color:var(--warn);}
+.pay-history{margin-top:0;}
+.ph-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:13px;}
+.ph-row:last-child{border-bottom:none;}
+.ph-name{color:var(--txt);}
+.ph-date{font-size:11px;color:var(--m2);}
+.ph-val{font-family:'Syne',sans-serif;font-weight:600;color:var(--ac2);}
+
+/* SETTINGS */
+.settings-wrap{padding:28px;max-width:520px;}
+.settings-section{margin-bottom:28px;}
+.settings-section h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px;color:var(--m1);text-transform:uppercase;letter-spacing:.8px;}
+
+@media(max-width:680px){
+  .sidebar{display:none;}
+  .stat-val{font-size:16px;}
+  .grid{padding:14px 16px 40px;grid-template-columns:1fr;}
+  .topbar{padding:16px;}
+  .toolbar{padding:12px 16px;}
+  .row2,.row3{grid-template-columns:1fr;}
+  .ie-row{grid-template-columns:1fr 70px 70px 36px;}
+  .ie-header{grid-template-columns:1fr 70px 70px 36px;}
+  .ie-row .dest-col,.ie-header .dest-hdr{display:none;}
+  .dash-grid{padding:14px 16px 40px;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">cobr<span>.</span>ai</div>
+  <div class="sidebar-section">Visão</div>
+  <button class="nav-item active" id="nav-home" onclick="showPage('home')">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+    Painel
+  </button>
+  <button class="nav-item" id="nav-dash" onclick="showPage('dash')">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Dashboard
+  </button>
+  <button class="nav-item" id="nav-people" onclick="showPage('people')">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Pessoas
+  </button>
+  <button class="nav-item" id="nav-settings" onclick="showPage('settings')">
+    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Configurações
+  </button>
+  <div class="sidebar-section" style="margin-top:8px;">Meses</div>
+  <div class="month-list" id="monthList"></div>
+  <button class="btn-new-month" onclick="openNewMonth()">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Novo mês
+  </button>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- HOME -->
+  <div id="page-home">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">—</div>
+      <div class="topbar-right">
+        <button class="pill" onclick="openImport()">📋 Importar planilha</button>
+        <button class="pill" onclick="sendAll()">📤 Enviar todos</button>
+        <button class="pill on" onclick="openAddPerson()">+ Pessoa</button>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Total</div><div class="stat-val green" id="sTotal">—</div></div>
+      <div class="stat"><div class="stat-label">Pendente</div><div class="stat-val warn" id="sPending">—</div></div>
+      <div class="stat"><div class="stat-label">Recebido</div><div class="stat-val" id="sPaid">—</div></div>
+      <div class="stat"><div class="stat-label">Pessoas</div><div class="stat-val" id="sCount">—</div></div>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Buscar pessoa..." oninput="renderCards()">
+      </div>
+      <button class="pill on" id="fAll" onclick="setFilter('all')">Todos</button>
+      <button class="pill" id="fPending" onclick="setFilter('pending')">Pendentes</button>
+      <button class="pill" id="fPaid" onclick="setFilter('paid')">Pagos</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="page-dash" style="display:none;">
+    <div class="topbar"><div class="topbar-title">Dashboard</div></div>
+    <div class="dash-grid" id="dashGrid"></div>
+  </div>
+
+  <!-- PEOPLE -->
+  <div id="page-people" style="display:none;">
+    <div class="topbar">
+      <div class="topbar-title">Cadastro de Pessoas</div>
+      <div class="topbar-right"><button class="pill on" onclick="openAddPerson()">+ Nova pessoa</button></div>
+    </div>
+    <div style="padding:20px 28px;" id="peopleList"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="page-settings" style="display:none;">
+    <div class="topbar"><div class="topbar-title">Configurações</div></div>
+    <div class="settings-wrap">
+      <div class="settings-section">
+        <h3>Seus dados Pix</h3>
+        <div class="field"><label>Chave Pix</label><input type="text" id="cfgPix" placeholder="CPF, telefone ou email"></div>
+        <div class="field"><label>Nome do titular</label><input type="text" id="cfgName" placeholder="Nome como aparece no Pix"></div>
+        <button class="btn-save" style="width:100%;" onclick="saveSettings()">Salvar configurações</button>
+      </div>
+      <div class="settings-section">
+        <h3>Backup</h3>
+        <button class="btn-cancel" style="width:100%;margin-bottom:10px;" onclick="exportData()">📥 Exportar backup (JSON)</button>
+        <label style="display:block;width:100%;">
+          <span class="btn-cancel" style="display:block;text-align:center;">📤 Importar backup (JSON)</span>
+          <input type="file" accept=".json" style="display:none;" onchange="importData(event)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL: SEND -->
+<div class="overlay" id="ovSend" onclick="closeOverlay('ovSend',event)">
+  <div class="modal">
+    <div class="mh"><h2 id="sendTitle">Cobrança</h2><button class="mclose" onclick="closeOverlay('ovSend')">×</button></div>
+    <div class="mb">
+      <div class="msg-preview" id="msgPreview"></div>
+      <div class="pix-bar">💚 Chave Pix: <strong id="pixDisplay">—</strong></div>
+    </div>
+    <div class="mf">
+      <button class="btn-wpp" onclick="openWhatsApp()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Enviar pelo WhatsApp
+      </button>
+      <button class="btn-copy2" onclick="copyMsg()">Copiar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD/EDIT PERSON -->
+<div class="overlay" id="ovPerson" onclick="closeOverlay('ovPerson',event)">
+  <div class="modal modal-lg">
+    <div class="mh"><h2 id="personModalTitle">Nova pessoa</h2><button class="mclose" onclick="closeOverlay('ovPerson')">×</button></div>
+    <div class="mb">
+      <div class="row2">
+        <div class="field"><label>Nome</label><input type="text" id="pName" placeholder="Ex: Levi"></div>
+        <div class="field"><label>WhatsApp (com DDD)</label><input type="text" id="pPhone" placeholder="85999999999"></div>
+      </div>
+      <div class="field" style="margin-top:4px;">
+        <label>Cobranças</label>
+        <div class="items-editor">
+          <div class="ie-header">
+            <span>Descrição</span><span class="dest-hdr">Destino</span><span>Valor R$</span><span>Cat.</span><span></span>
+          </div>
+          <div id="ieRows"></div>
+          <button class="btn-add-item" onclick="addItemRow()">+ Adicionar item</button>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-cancel" onclick="closeOverlay('ovPerson')">Cancelar</button>
+      <button class="btn-save" onclick="savePerson()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NEW MONTH -->
+<div class="overlay" id="ovMonth" onclick="closeOverlay('ovMonth',event)">
+  <div class="modal" style="max-width:380px;">
+    <div class="mh"><h2>Novo mês</h2><button class="mclose" onclick="closeOverlay('ovMonth')">×</button></div>
+    <div class="mb">
+      <div class="field"><label>Nome do mês</label><input type="text" id="newMonthName" placeholder="Ex: Julho 2026"></div>
+      <div style="margin-top:12px;">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--m1);cursor:pointer;">
+          <input type="checkbox" id="copyPrevMonth" checked style="accent-color:var(--ac);width:16px;height:16px;">
+          Copiar pessoas e itens do mês atual (pagamentos zerados)
+        </label>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-cancel" onclick="closeOverlay('ovMonth')">Cancelar</button>
+      <button class="btn-save" onclick="createMonth()">Criar mês</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MARK PAID -->
+<div class="overlay" id="ovPay" onclick="closeOverlay('ovPay',event)">
+  <div class="modal" style="max-width:360px;">
+    <div class="mh"><h2 id="payTitle">Registrar pagamento</h2><button class="mclose" onclick="closeOverlay('ovPay')">×</button></div>
+    <div class="mb">
+      <div class="field">
+        <label>Data do pagamento</label>
+        <input type="date" id="payDate">
+      </div>
+      <p style="font-size:13px;color:var(--m2);">Essa data ficará registrada no histórico do dashboard.</p>
+    </div>
+    <div class="mf">
+      <button class="btn-cancel" onclick="closeOverlay('ovPay')">Cancelar</button>
+      <button class="btn-save" onclick="confirmPay()">Confirmar pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CSV IMPORT -->
+<div class="overlay" id="ovImport" onclick="closeOverlay('ovImport',event)">
+  <div class="modal modal-lg">
+    <div class="mh"><h2>Importar cobranças em lote</h2><button class="mclose" onclick="closeOverlay('ovImport')">×</button></div>
+    <div class="mb">
+      <div class="csv-info" style="margin-bottom:14px;">
+        <strong>Formato do arquivo CSV:</strong><br>
+        Colunas: <code>nome, descricao, valor, destino</code><br>
+        Exemplo: <code>Levi, Geladeira 10/12, 188.79, Nubank</code><br>
+        Separe com vírgula. Uma linha por cobrança. Sem cabeçalho obrigatório (se tiver, será ignorado).
+      </div>
+      <div class="csv-box" id="csvBox" onclick="document.getElementById('csvFile').click()" ondragover="csvDrag(event,true)" ondragleave="csvDrag(event,false)" ondrop="csvDrop(event)">
+        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--m2);margin-bottom:6px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 11 15 14"/></svg>
+        <p>Clique ou arraste seu arquivo CSV aqui</p>
+        <input type="file" id="csvFile" accept=".csv,.txt" style="display:none;" onchange="loadCsv(event)">
+      </div>
+      <div id="csvPreviewWrap" style="display:none;">
+        <p style="font-size:12px;color:var(--m1);margin-bottom:8px;" id="csvCount"></p>
+        <div class="csv-preview" id="csvPreview"></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-cancel" onclick="closeOverlay('ovImport')">Cancelar</button>
+      <button class="btn-save" id="btnImportConfirm" onclick="confirmImport()" style="display:none;">Importar para este mês</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY = 'cobrAI_v3';
+const DESTINOS = ['Nubank','Boleto','Porto Seguro','Devolver Poupança','Outro'];
+
+let state = {
+  pix:'04362642340', pixName:'Francisca Waleska',
+  months:[], activeMonthId:null
+};
+
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function load(){
+  try{ const d=JSON.parse(localStorage.getItem(STORE_KEY)); if(d) state=d; }catch(e){}
+  // migrate from old key
+  if(!state.months.length){
+    try{
+      const old=JSON.parse(localStorage.getItem('cobrAI_v2'));
+      if(old && old.months){
+        state.pix=old.pix||state.pix;
+        state.pixName=old.pixName||state.pixName;
+        state.months=old.months.map(m=>({
+          ...m,
+          people:m.people.map(p=>({
+            ...p,
+            paidDate:p.paidDate||null,
+            items:p.items.map(i=>({desc:i.desc,val:i.val,dest:i.dest||'',cat:i.cat||''}))
+          }))
+        }));
+        state.activeMonthId=old.activeMonthId;
+      }
+    }catch(e){}
+  }
+}
+
+function activeMonth(){ return state.months.find(m=>m.id===state.activeMonthId)||state.months[0]||null; }
+
+function boot(){
+  load();
+  if(!state.months.length){
+    const seed={
+      id:uid(), label:'Mai 2026',
+      people:[
+        {id:uid(),name:'Mãe',        phone:'',paid:false,paidDate:null,items:[{desc:'Internet Sítio',val:69.00,dest:'Boleto',cat:''},{desc:'Zelo',val:77.11,dest:'Boleto',cat:''},{desc:'TikTok 2/2',val:23.29,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Levi',       phone:'',paid:false,paidDate:null,items:[{desc:'Disney | Star+ | MAX',val:25.00,dest:'Nubank',cat:''},{desc:'Geladeira 10/12',val:188.79,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Valéria',    phone:'',paid:false,paidDate:null,items:[{desc:'Plano de Saúde Pai',val:192.30,dest:'Boleto',cat:''},{desc:'Máquina de lavar 7/12',val:149.00,dest:'Nubank',cat:''},{desc:'Geladeira 10/12',val:188.79,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Ton',        phone:'',paid:true, paidDate:'2026-05-04',items:[{desc:'TV 7/10',val:365.48,dest:'Nubank',cat:''},{desc:'Celular 3/12',val:398.00,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Thayná',     phone:'',paid:true, paidDate:'2026-05-04',items:[{desc:'Assinaturas',val:45.00,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Tia Erinelda',phone:'',paid:false,paidDate:null,items:[{desc:'Assinaturas',val:35.00,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Messias',    phone:'',paid:false,paidDate:null,items:[{desc:'Moto 8/18',val:389.04,dest:'Porto Seguro',cat:''}]},
+        {id:uid(),name:'Eugênio',    phone:'',paid:false,paidDate:null,items:[{desc:'Celular 2 6/10',val:250.00,dest:'Nubank',cat:''}]},
+        {id:uid(),name:'Izabel',     phone:'',paid:false,paidDate:null,items:[{desc:'Celular 5/10',val:100.00,dest:'Devolver Poupança',cat:''}]},
+        {id:uid(),name:'Priscila',   phone:'',paid:false,paidDate:null,items:[{desc:'Geladeira 3/6',val:510.00,dest:'Devolver Poupança',cat:''}]},
+        {id:uid(),name:'Wanderléa',  phone:'',paid:true, paidDate:'2026-05-04',items:[{desc:'Plano de Saúde Pai',val:192.30,dest:'Boleto',cat:''}]},
+        {id:uid(),name:'Wanessa',    phone:'',paid:true, paidDate:'2026-05-04',items:[{desc:'Plano de Saúde Pai',val:192.30,dest:'Boleto',cat:''}]},
+        {id:uid(),name:'Dierlane',   phone:'',paid:true, paidDate:'2026-05-04',items:[{desc:'Pix Crédito 1/3',val:284.12,dest:'Nubank',cat:''}]},
+      ]
+    };
+    state.months.push(seed);
+    state.activeMonthId=seed.id;
+    save();
+  }
+  if(!state.activeMonthId && state.months.length) state.activeMonthId=state.months[0].id;
+  renderSidebar(); renderPage();
+  document.getElementById('cfgPix').value=state.pix;
+  document.getElementById('cfgName').value=state.pixName;
+}
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function fmt(v){ return (+v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function total(p){ return p.items.reduce((s,i)=>s+(+i.val),0); }
+function fmtDate(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; }
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// PAGES
+let currentPage='home';
+function showPage(p){
+  currentPage=p;
+  ['home','dash','people','settings'].forEach(x=>{
+    document.getElementById('page-'+x).style.display=x===p?'':'none';
+    document.getElementById('nav-'+x)?.classList.toggle('active',x===p);
+  });
+  if(p==='home') renderCards();
+  if(p==='dash') renderDash();
+  if(p==='people') renderPeoplePage();
+}
+
+// SIDEBAR
+function renderSidebar(){
+  const list=document.getElementById('monthList');
+  list.innerHTML=state.months.map(m=>{
+    const pend=m.people.filter(p=>!p.paid).length;
+    return `<button class="month-btn ${m.id===state.activeMonthId?'active':''}" onclick="switchMonth('${m.id}')">
+      <span>${m.label}</span>
+      ${pend>0?`<span class="mbadge">${pend}</span>`:`<span class="mbadge" style="color:var(--ac)">✓</span>`}
+    </button>`;
+  }).join('');
+}
+
+function switchMonth(id){
+  state.activeMonthId=id; save(); renderSidebar(); renderPage();
+}
+
+function renderPage(){
+  const m=activeMonth();
+  document.getElementById('pageTitle').textContent=m?m.label:'—';
+  renderCards();
+}
+
+// FILTER
+let filter='all';
+function setFilter(f){
+  filter=f;
+  ['All','Pending','Paid'].forEach(x=>document.getElementById('f'+x).classList.toggle('on',f===x.toLowerCase()));
+  renderCards();
+}
+
+// CARDS
+function renderCards(){
+  const m=activeMonth();
+  const grid=document.getElementById('grid');
+  if(!m){ grid.innerHTML='<div class="empty-state"><h3>Nenhum mês criado</h3></div>'; return; }
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const people=m.people.filter(p=>{
+    if(q && !p.name.toLowerCase().includes(q)) return false;
+    if(filter==='pending' && p.paid) return false;
+    if(filter==='paid' && !p.paid) return false;
+    return true;
+  });
+  document.getElementById('sTotal').textContent=fmt(m.people.reduce((s,p)=>s+total(p),0));
+  document.getElementById('sPending').textContent=fmt(m.people.filter(p=>!p.paid).reduce((s,p)=>s+total(p),0));
+  document.getElementById('sPaid').textContent=fmt(m.people.filter(p=>p.paid).reduce((s,p)=>s+total(p),0));
+  document.getElementById('sCount').textContent=`${m.people.filter(p=>!p.paid).length} pend.`;
+  if(!people.length){ grid.innerHTML='<div class="empty-state"><h3>Nenhuma pessoa aqui</h3></div>'; return; }
+  grid.innerHTML=people.map(p=>{
+    const t=total(p);
+    const items=p.items.map(i=>`
+      <div class="ci">
+        <span class="ci-desc">${i.desc}</span>
+        <span class="ci-val">${fmt(i.val)}</span>
+      </div>`).join('');
+    const dateStr=p.paid&&p.paidDate?`<span class="paid-date">· ${fmtDate(p.paidDate)}</span>`:'';
+    return `<div class="card ${p.paid?'paid':''}" id="card-${p.id}">
+      <div class="card-head">
+        <div class="card-name">${p.name}<span class="paid-tag">✓ pago</span>${dateStr}</div>
+        <div class="card-total">${fmt(t)}</div>
+      </div>
+      <div class="card-items">${items}</div>
+      <div class="card-foot">
+        <button class="btn-primary" onclick="openSend('${p.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Enviar cobrança
+        </button>
+        <button class="btn-icon" title="Editar" onclick="openEditPerson('${p.id}')">✏️</button>
+        <button class="btn-icon pay-btn" title="${p.paid?'Desfazer pagamento':'Marcar como pago'}" onclick="${p.paid?`undoPay('${p.id}')`:`openPay('${p.id}')`}">${p.paid?'↩':'✓'}</button>
+        <button class="btn-icon del" title="Remover" onclick="deletePerson('${p.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// SEND
+let currentSendPerson=null;
+function buildMsg(p){
+  const m=activeMonth();
+  const t=total(p);
+  let lines=[`Olá, ${p.name}! 👋`,`Segue o resumo das despesas de ${m?.label||''}:\n`];
+  p.items.forEach(i=>lines.push(`• ${i.desc}: *${fmt(i.val)}*`));
+  lines.push(`\n💰 *Total: ${fmt(t)}*`);
+  lines.push(`\nChave Pix: *${state.pix}*`);
+  lines.push(`(${state.pixName})`);
+  lines.push(`\nObrigada! 🙏`);
+  return lines.join('\n');
+}
+function openSend(id){
+  const m=activeMonth();
+  currentSendPerson=m?.people.find(p=>p.id===id);
+  if(!currentSendPerson) return;
+  document.getElementById('sendTitle').textContent=`Cobrança — ${currentSendPerson.name}`;
+  document.getElementById('msgPreview').textContent=buildMsg(currentSendPerson);
+  document.getElementById('pixDisplay').textContent=`${state.pix} — ${state.pixName}`;
+  document.getElementById('ovSend').classList.add('open');
+}
+function openWhatsApp(){
+  if(!currentSendPerson) return;
+  const msg=encodeURIComponent(buildMsg(currentSendPerson));
+  const phone=(currentSendPerson.phone||'').replace(/\D/g,'');
+  window.open(phone?`https://wa.me/55${phone}?text=${msg}`:`https://wa.me/?text=${msg}`,'_blank');
+}
+function copyMsg(){
+  if(!currentSendPerson) return;
+  navigator.clipboard.writeText(buildMsg(currentSendPerson)).then(()=>{
+    const b=document.querySelector('.btn-copy2'); b.textContent='Copiado ✓'; setTimeout(()=>b.textContent='Copiar',1600);
+  });
+}
+function sendAll(){
+  const m=activeMonth(); if(!m) return;
+  const pending=m.people.filter(p=>!p.paid);
+  if(!pending.length){ toast('Todos já foram pagos! 🎉'); return; }
+  pending.forEach((p,i)=>setTimeout(()=>{
+    const msg=encodeURIComponent(buildMsg(p));
+    const phone=(p.phone||'').replace(/\D/g,'');
+    window.open(phone?`https://wa.me/55${phone}?text=${msg}`:`https://wa.me/?text=${msg}`,'_blank');
+  },i*600));
+}
+
+// PAY
+let payingPersonId=null;
+function openPay(id){
+  payingPersonId=id;
+  const m=activeMonth();
+  const p=m?.people.find(x=>x.id===id);
+  document.getElementById('payTitle').textContent=`Pagamento — ${p?.name||''}`;
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('payDate').value=today;
+  document.getElementById('ovPay').classList.add('open');
+}
+function confirmPay(){
+  const m=activeMonth();
+  const p=m?.people.find(x=>x.id===payingPersonId);
+  if(p){
+    p.paid=true;
+    p.paidDate=document.getElementById('payDate').value;
+    save(); renderSidebar(); renderCards();
+    toast(`${p.name} marcado como pago ✓`);
+  }
+  closeOverlay('ovPay');
+}
+function undoPay(id){
+  const m=activeMonth();
+  const p=m?.people.find(x=>x.id===id);
+  if(p){ p.paid=false; p.paidDate=null; save(); renderSidebar(); renderCards(); }
+}
+
+// PERSON MODAL
+let editingPersonId=null;
+function openAddPerson(){
+  editingPersonId=null;
+  document.getElementById('personModalTitle').textContent='Nova pessoa';
+  document.getElementById('pName').value='';
+  document.getElementById('pPhone').value='';
+  document.getElementById('ieRows').innerHTML='';
+  addItemRow(); addItemRow();
+  document.getElementById('ovPerson').classList.add('open');
+}
+function openEditPerson(id){
+  const m=activeMonth();
+  const p=m?.people.find(x=>x.id===id);
+  if(!p) return;
+  editingPersonId=id;
+  document.getElementById('personModalTitle').textContent=`Editar — ${p.name}`;
+  document.getElementById('pName').value=p.name;
+  document.getElementById('pPhone').value=p.phone||'';
+  document.getElementById('ieRows').innerHTML='';
+  p.items.forEach(i=>addItemRow(i.desc,i.val,i.dest||'',i.cat||''));
+  document.getElementById('ovPerson').classList.add('open');
+}
+function addItemRow(desc='',val='',dest='',cat=''){
+  const row=document.createElement('div');
+  row.className='ie-row';
+  const destOpts=DESTINOS.map(d=>`<option value="${d}" ${dest===d?'selected':''}>${d}</option>`).join('');
+  row.innerHTML=`
+    <input type="text" placeholder="Descrição" value="${desc}" class="ie-desc">
+    <select class="ie-dest dest-col"><option value="">Destino</option>${destOpts}</select>
+    <input type="number" placeholder="0.00" step="0.01" value="${val||''}" class="ie-val">
+    <input type="text" placeholder="Cat." value="${cat}" class="ie-cat" style="max-width:80px;">
+    <button class="ie-del" onclick="this.closest('.ie-row').remove()">×</button>`;
+  document.getElementById('ieRows').appendChild(row);
+}
+function savePerson(){
+  const name=document.getElementById('pName').value.trim();
+  if(!name){ toast('Informe o nome!'); return; }
+  const phone=document.getElementById('pPhone').value.trim();
+  const rows=document.querySelectorAll('#ieRows .ie-row');
+  const items=[];
+  rows.forEach(r=>{
+    const desc=r.querySelector('.ie-desc').value.trim();
+    const val=parseFloat(r.querySelector('.ie-val').value)||0;
+    const dest=r.querySelector('.ie-dest').value;
+    const cat=r.querySelector('.ie-cat').value.trim();
+    if(desc && val>0) items.push({desc,val,dest,cat});
+  });
+  const m=activeMonth();
+  if(!m){ toast('Crie um mês primeiro!'); return; }
+  if(editingPersonId){
+    const p=m.people.find(x=>x.id===editingPersonId);
+    if(p){ p.name=name; p.phone=phone; p.items=items; }
+  } else {
+    m.people.push({id:uid(),name,phone,paid:false,paidDate:null,items});
+  }
+  save(); renderSidebar(); renderCards(); renderPeoplePage();
+  closeOverlay('ovPerson');
+  toast(editingPersonId?'Pessoa atualizada!':'Pessoa adicionada!');
+}
+function deletePerson(id){
+  if(!confirm('Remover esta pessoa deste mês?')) return;
+  const m=activeMonth();
+  if(m){ m.people=m.people.filter(x=>x.id!==id); save(); renderSidebar(); renderCards(); renderPeoplePage(); }
+}
+
+// PEOPLE PAGE
+function renderPeoplePage(){
+  const m=activeMonth();
+  const el=document.getElementById('peopleList');
+  if(!m){ el.innerHTML='<p style="color:var(--m2)">Nenhum mês criado.</p>'; return; }
+  if(!m.people.length){ el.innerHTML='<p style="color:var(--m2)">Nenhuma pessoa neste mês.</p>'; return; }
+  el.innerHTML=m.people.map(p=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd);">
+      <div>
+        <div style="font-family:Syne,sans-serif;font-weight:700;font-size:15px;">${p.name}</div>
+        <div style="font-size:12px;color:var(--m2);margin-top:2px;">${p.phone||'Sem número'} · ${p.items.length} item(s) · ${fmt(total(p))}${p.paidDate?' · pago em '+fmtDate(p.paidDate):''}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-icon" onclick="openEditPerson('${p.id}')">✏️</button>
+        <button class="btn-icon del" onclick="deletePerson('${p.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+// MONTHS
+function openNewMonth(){ document.getElementById('ovMonth').classList.add('open'); }
+function createMonth(){
+  const label=document.getElementById('newMonthName').value.trim();
+  if(!label){ toast('Informe o nome do mês!'); return; }
+  const copy=document.getElementById('copyPrevMonth').checked;
+  const cur=activeMonth();
+  let people=[];
+  if(copy && cur){
+    people=cur.people.map(p=>({
+      id:uid(),name:p.name,phone:p.phone,paid:false,paidDate:null,
+      items:p.items.map(i=>({...i}))
+    }));
+  }
+  const newM={id:uid(),label,people};
+  state.months.push(newM);
+  state.activeMonthId=newM.id;
+  save(); renderSidebar(); renderPage();
+  closeOverlay('ovMonth');
+  document.getElementById('newMonthName').value='';
+  toast(`Mês "${label}" criado!`);
+}
+
+// CSV IMPORT
+let csvData=[];
+function openImport(){
+  csvData=[];
+  document.getElementById('csvPreviewWrap').style.display='none';
+  document.getElementById('btnImportConfirm').style.display='none';
+  document.getElementById('csvFile').value='';
+  document.getElementById('ovImport').classList.add('open');
+}
+function csvDrag(e,on){ e.preventDefault(); document.getElementById('csvBox').classList.toggle('drag',on); }
+function csvDrop(e){ e.preventDefault(); csvDrag(e,false); const f=e.dataTransfer.files[0]; if(f) parseCsvFile(f); }
+function loadCsv(e){ const f=e.target.files[0]; if(f) parseCsvFile(f); }
+function parseCsvFile(file){
+  const r=new FileReader();
+  r.onload=ev=>{
+    const lines=ev.target.result.split('\n').map(l=>l.trim()).filter(l=>l);
+    csvData=[];
+    lines.forEach((line,idx)=>{
+      const parts=line.split(',').map(s=>s.trim());
+      if(parts.length<3) return;
+      const nome=parts[0], desc=parts[1], val=parseFloat(parts[2]), dest=parts[3]||'';
+      if(!nome||isNaN(val)) return;
+      // skip header row
+      if(idx===0 && isNaN(val)) return;
+      csvData.push({nome,desc,val,dest});
+    });
+    showCsvPreview();
+  };
+  r.readAsText(file,'UTF-8');
+}
+function showCsvPreview(){
+  const wrap=document.getElementById('csvPreviewWrap');
+  const preview=document.getElementById('csvPreview');
+  const count=document.getElementById('csvCount');
+  if(!csvData.length){ toast('Nenhum dado válido encontrado no arquivo.'); return; }
+  count.textContent=`${csvData.length} cobrança(s) encontrada(s)`;
+  preview.innerHTML=`<table><thead><tr><th>Nome</th><th>Descrição</th><th>Valor</th><th>Destino</th></tr></thead><tbody>`+
+    csvData.slice(0,10).map(r=>`<tr><td>${r.nome}</td><td>${r.desc}</td><td>${fmt(r.val)}</td><td>${r.dest||'—'}</td></tr>`).join('')+
+    (csvData.length>10?`<tr><td colspan="4" style="color:var(--m2);text-align:center;">... e mais ${csvData.length-10} linhas</td></tr>`:'')+
+    `</tbody></table>`;
+  wrap.style.display='block';
+  document.getElementById('btnImportConfirm').style.display='block';
+}
+function confirmImport(){
+  const m=activeMonth();
+  if(!m){ toast('Crie um mês primeiro!'); return; }
+  // group by name
+  const byName={};
+  csvData.forEach(r=>{
+    if(!byName[r.nome]) byName[r.nome]=[];
+    byName[r.nome].push({desc:r.desc,val:r.val,dest:r.dest,cat:''});
+  });
+  let added=0, updated=0;
+  Object.entries(byName).forEach(([nome,items])=>{
+    const existing=m.people.find(p=>p.name.toLowerCase()===nome.toLowerCase());
+    if(existing){
+      // append items that don't already exist
+      items.forEach(ni=>{
+        if(!existing.items.find(ei=>ei.desc===ni.desc)){
+          existing.items.push(ni); updated++;
+        }
+      });
+    } else {
+      m.people.push({id:uid(),name:nome,phone:'',paid:false,paidDate:null,items});
+      added++;
+    }
+  });
+  save(); renderSidebar(); renderCards();
+  closeOverlay('ovImport');
+  toast(`${added} pessoa(s) adicionada(s), ${updated} item(s) atualizado(s)!`);
+}
+
+// DASHBOARD
+function renderDash(){
+  const dash=document.getElementById('dashGrid');
+  if(!state.months.length){ dash.innerHTML='<p style="color:var(--m2);padding:20px;">Nenhum dado ainda.</p>'; return; }
+
+  // by month bars
+  const monthData=state.months.map(m=>{
+    const tot=m.people.reduce((s,p)=>s+total(p),0);
+    const rec=m.people.filter(p=>p.paid).reduce((s,p)=>s+total(p),0);
+    const pend=tot-rec;
+    return {label:m.label,tot,rec,pend};
+  });
+  const maxVal=Math.max(...monthData.map(d=>d.tot),1);
+
+  const monthBars=monthData.map(d=>`
+    <div class="bar-row">
+      <span class="bar-label">${d.label}</span>
+      <div style="flex:1;">
+        <div class="bar-track" style="margin-bottom:3px;">
+          <div class="bar-fill paid" style="width:${(d.rec/maxVal*100).toFixed(1)}%"></div>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill pend" style="width:${(d.pend/maxVal*100).toFixed(1)}%"></div>
+        </div>
+      </div>
+      <div style="min-width:110px;text-align:right;">
+        <div style="font-size:11px;color:var(--ac2);">${fmt(d.rec)}</div>
+        <div style="font-size:11px;color:var(--warn);">${fmt(d.pend)}</div>
+      </div>
+    </div>`).join('');
+
+  // year totals
+  const allPeople=state.months.flatMap(m=>m.people);
+  const yearTotal=allPeople.reduce((s,p)=>s+total(p),0);
+  const yearRec=allPeople.filter(p=>p.paid).reduce((s,p)=>s+total(p),0);
+  const yearPend=yearTotal-yearRec;
+
+  // recent payments
+  const recentPaid=state.months.flatMap(m=>
+    m.people.filter(p=>p.paid&&p.paidDate).map(p=>({name:p.name,val:total(p),date:p.paidDate,month:m.label}))
+  ).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+
+  const payRows=recentPaid.length
+    ? recentPaid.map(r=>`
+        <div class="ph-row">
+          <div><span class="ph-name">${r.name}</span><br><span class="ph-date">${r.month} · ${fmtDate(r.date)}</span></div>
+          <span class="ph-val">${fmt(r.val)}</span>
+        </div>`).join('')
+    : '<p style="color:var(--m2);font-size:13px;padding:8px 0;">Nenhum pagamento registrado ainda.</p>';
+
+  // top debtors across all months (pending)
+  const pendMap={};
+  state.months.forEach(m=>m.people.forEach(p=>{
+    if(!p.paid){ if(!pendMap[p.name]) pendMap[p.name]=0; pendMap[p.name]+=total(p); }
+  }));
+  const topPend=Object.entries(pendMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxPend=Math.max(...topPend.map(x=>x[1]),1);
+  const topBars=topPend.length
+    ? topPend.map(([name,val])=>`
+        <div class="bar-row">
+          <span class="bar-label" style="min-width:90px;font-size:11px;">${name}</span>
+          <div class="bar-track"><div class="bar-fill pend" style="width:${(val/maxPend*100).toFixed(1)}%"></div></div>
+          <span class="bar-val" style="min-width:90px;text-align:right;">${fmt(val)}</span>
+        </div>`).join('')
+    : '<p style="color:var(--m2);font-size:13px;">Nenhum pendente.</p>';
+
+  dash.innerHTML=`
+    <div class="dash-card wide">
+      <h3>Resumo do ano</h3>
+      <div class="year-summary">
+        <div class="ys-item"><div class="ys-label">Total cobrado</div><div class="ys-val g">${fmt(yearTotal)}</div></div>
+        <div class="ys-item"><div class="ys-label">Recebido</div><div class="ys-val g">${fmt(yearRec)}</div></div>
+        <div class="ys-item"><div class="ys-label">Pendente</div><div class="ys-val w">${fmt(yearPend)}</div></div>
+      </div>
+    </div>
+    <div class="dash-card wide">
+      <h3>Recebido vs Pendente por mês</h3>
+      <div style="margin-bottom:8px;display:flex;gap:16px;font-size:11px;">
+        <span style="display:flex;align-items:center;gap:5px;color:var(--ac2);"><span style="width:10px;height:6px;background:var(--ac2);border-radius:3px;display:inline-block;"></span>Recebido</span>
+        <span style="display:flex;align-items:center;gap:5px;color:var(--warn);"><span style="width:10px;height:6px;background:var(--warn);border-radius:3px;display:inline-block;"></span>Pendente</span>
+      </div>
+      ${monthBars}
+    </div>
+    <div class="dash-card">
+      <h3>Maiores pendências</h3>
+      ${topBars}
+    </div>
+    <div class="dash-card">
+      <h3>Últimos pagamentos</h3>
+      <div class="pay-history">${payRows}</div>
+    </div>`;
+}
+
+// SETTINGS
+function saveSettings(){
+  state.pix=document.getElementById('cfgPix').value.trim();
+  state.pixName=document.getElementById('cfgName').value.trim();
+  save(); toast('Configurações salvas!');
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='cobrancas_backup.json';
+  a.click();
+}
+function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{ try{ state=JSON.parse(ev.target.result); save(); boot(); toast('Backup importado!'); }catch{ toast('Arquivo inválido!'); }};
+  r.readAsText(file);
+}
+
+// MODALS
+function closeOverlay(id,e){
+  if(!e||e.target===document.getElementById(id)) document.getElementById(id).classList.remove('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'));
+});
+
+boot();
+</script>
+</body>
+</html>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>cobr.ai — Waleska</title>
