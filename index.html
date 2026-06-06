@@ -392,7 +392,7 @@ input,select,textarea{font-family:'DM Sans',sans-serif;}
   <div class="modal" style="max-width:380px;">
     <div class="mh"><h2>Novo mês</h2><button class="mclose" onclick="closeOverlay('ovMonth')">×</button></div>
     <div class="mb">
-      <div class="field"><label>Nome do mês</label><input type="text" id="newMonthName" placeholder="Ex: Julho 2025"></div>
+      <div class="field"><label>Nome do mês</label><input type="text" id="newMonthName" placeholder="Ex: Julho 2026"></div>
       <div style="margin-top:12px;">
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--m1);cursor:pointer;">
           <input type="checkbox" id="copyPrevMonth" checked style="accent-color:var(--ac);width:16px;height:16px;">
@@ -440,7 +440,7 @@ function boot() {
   load();
   if (state.months.length === 0) {
     const seedMonth = {
-      id: uid(), label: 'Jun 2025',
+      id: uid(), label: 'Mai 2026',
       people: [
         { id:uid(), name:'Mãe',         phone:'', paid:false, items:[{desc:'Internet Sítio',due:'3/6',val:69.00},{desc:'Zelo',due:'3/6',val:77.11},{desc:'TikTok 2/2',due:'3/6',val:23.29}]},
         { id:uid(), name:'Levi',        phone:'', paid:false, items:[{desc:'Disney | Star+ | MAX',due:'5/6',val:25.00},{desc:'Geladeira 10/12',due:'5/6',val:188.79}]},
